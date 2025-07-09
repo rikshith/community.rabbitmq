@@ -4,22 +4,34 @@ on: [push, pull_request]
 
 jobs:
   sanity:
+    name: Run ansible-test sanity
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        ansible-version: [devel]
+        ansible-version: ["devel"]
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
-      - name: Install Ansible
+      - name: Install Ansible (devel branch)
         run: |
-          pip install git+https://github.com/ansible/ansible.git@devel
+          pip install git+https://github.com/ansible/ansible.git@${{ matrix.ansible-version }}
+
+      - name: Set up expected Ansible collection path
+        run: |
+          mkdir -p ~/.ansible/collections/ansible_collections/community
+          cp -a $GITHUB_WORKSPACE ~/.ansible/collections/ansible_collections/community/rabbitmq
+          echo "::set-output name=collection_path::~/.ansible/collections/ansible_collections/community/rabbitmq"
 
       - name: Run sanity tests
         run: |
+          cd ~/.ansible/collections/ansible_collections/community/rabbitmq
           ansible-test sanity --docker
+
