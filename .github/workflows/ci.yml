@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ansible-version: [stable-2.20]
+        ansible-version: devel
     steps:
       - uses: actions/checkout@v3
 
@@ -18,7 +18,7 @@ jobs:
 
       - name: Install Ansible
         run: |
-          pip install git+https://github.com/ansible/ansible.git@${{ matrix.ansible-version }}
+          pip install git+https://github.com/ansible/ansible.git@devel
 
       - name: Run sanity tests
         run: |
