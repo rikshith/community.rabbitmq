@@ -1,0 +1,25 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ansible-version: [stable-2.20]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: |
+          pip install git+https://github.com/ansible/ansible.git@${{ matrix.ansible-version }}
+
+      - name: Run sanity tests
+        run: |
+          ansible-test sanity --docker
